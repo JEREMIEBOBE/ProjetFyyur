@@ -87,6 +87,7 @@ def venues():
 
             # on filtre maintenat a partir du (city, state)  regroupé
             #https://fellowship.hackbrightacademy.com/materials/serft8/lectures/sql-alchemy-2/
+            #https://stackoverflow.com/questions/8667960/sql-alchemy-group-by-in-query
             result1 = Venue.query.filter(Venue.state == rs.state, Venue.city == rs.city).group_by(Venue.city, Venue.state, Venue.name, Venue.id)
 
             data_result1 = []
@@ -96,6 +97,7 @@ def venues():
                 data_result1.append({
                     'id': v.id,
                     'name': v.name,
+                    #https://stackoverflow.com/questions/41478753/setting-datetime-in-flask-app
                     'num_upcoming_shows': len(db.session.query(Show).filter(Show.start_time > datetime.now()).all())
                 })
               
@@ -354,7 +356,7 @@ def create_venue_submission():
   # TODO: modify data to be the data object returned from db insertion
 
   form = VenueForm(request.form)
-
+  #https://stackoverflow.com/questions/41478753/setting-datetime-in-flask-app
   if request.method == 'POST':
 
     try:
