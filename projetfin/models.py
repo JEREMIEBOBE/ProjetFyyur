@@ -42,7 +42,7 @@ class Venue(db.Model):
     seeking_talent = db.Column(db.Boolean,  default=False)
     seeking_description = db.Column(db.String())
     #https://docs.sqlalchemy.org/en/14/orm/cascades.html#passive-deletes
-    show = db.relationship('Show', backref='venue', lazy=True, cascade="all, delete",passive_deletes=True,)
+    show = db.relationship('Show', backref='venue', lazy=True, cascade="all, delete-orphan",passive_deletes=True,)
 
 def __repr__(self):
     return f'<Venue {self.id} {self.name}>'

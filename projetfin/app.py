@@ -15,6 +15,7 @@ from forms import *
 
 #Mes importations
 #from models import Venue, Artist, Show
+
 import os
 from flask_migrate import Migrate
 from sqlalchemy.sql import func
@@ -29,7 +30,7 @@ from models import db, Venue, Artist, Show
 app = Flask(__name__)
 moment = Moment(app)
 app.config.from_object('config')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 
 #https://stackoverflow.com/questions/9692962/flask-sqlalchemy-import-context-issue/9695045#9695045
 db.init_app(app)
@@ -38,9 +39,7 @@ migrate = Migrate(app,db)
 
 # TODO: connect to a local postgresql database/OK
 
-
-
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
+# TODO: implement any missing fields, as a database migration using Flask-Migrate
 
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
 
@@ -101,13 +100,13 @@ def venues():
                     'num_upcoming_shows': len(db.session.query(Show).filter(Show.start_time > datetime.now()).all())
                 })
               
-      #on cree les données
-      data1.append({
-                    'city': rs.city,
-                    'state': rs.state,
-                    'venues': data_result1
-                })        
-        
+            #on cree les données
+            data1.append({
+                          'city': rs.city,
+                          'state': rs.state,
+                          'venues': data_result1
+                      })        
+              
       return render_template('pages/venues.html', areas=data1)
   
   except Exception as e:
@@ -355,9 +354,9 @@ def create_venue_submission():
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
 
-  form = VenueForm(request.form)
+  form = VenueForm()
   #https://stackoverflow.com/questions/41478753/setting-datetime-in-flask-app
-  if request.method == 'POST':
+  if form.validate_on_submit():
 
     try:
                   new_venue = Venue(
@@ -389,8 +388,8 @@ def create_venue_submission():
                   db.session.close()
     
   else:
-                  flash('An error occurred. Venue ' + form.name.data + ' could not be listed.')
-                  return render_template('pages/home.html')
+                  #flash('An error occurred. Venue ' + form.name.data + ' could nott be listed.')
+                  return render_template('forms/new_venue.html', form =  form)
                   db.session.rollback()
   
   # on successful db insert, flash success
@@ -642,7 +641,7 @@ def show_artist(artist_id):
 #  ----------------------------------------------------------------
 @app.route('/artists/<int:artist_id>/edit', methods=['GET'])
 def edit_artist(artist_id):
-  form = ArtistForm(request.form)
+  form = ArtistForm()
   artist = Artist.query.get_or_404(artist_id)
   artist1={
     "id": 4,
@@ -665,9 +664,9 @@ def edit_artist_submission(artist_id):
   # TODO: take values from the form submitted, and update existing
   # artist record with ID <artist_id> using the new attributes
 
-  form = ArtistForm(request.form)
-  #artist = Artist.query.get_or_404(artist_id)
-  if request.method == 'POST':
+  form = ArtistForm()
+  artist = Artist.query.get_or_404(artist_id)
+  if form.validate_on_submit():
     
     
     try:
@@ -689,21 +688,21 @@ def edit_artist_submission(artist_id):
                           'seeking_description' : form.seeking_description.data})
                       
                   db.session.commit()
-                  #flash('Artist ' + form.name.data + ' was successfully listed!')
+                  flash('Artist ' + form.name.data + ' was successfully update!')
                   return redirect(url_for('show_artist', artist_id=artist_id))
     
     except Exception as e:
                   print(e)
-                  flash('An error occurred. Artist ' + form.name.data + ' could not be listed.')
-                  return render_template('pages/home.html')
+                  flash('An error occurred. Artist ' + form.name.data + ' could not be update.')
+                  return render_template('forms/edit_artist.html', artist = artist, form =  form)
                   db.session.rollback()
     
     finally:
                   db.session.close()
     
   else:
-                  flash('An error occurred. Artist ' + form.name.data + ' could not be listed.')
-                  return render_template('pages/home.html')
+                  #flash('An error occurred. Artist ' + form.name.data + ' could not be listed.')
+                  return render_template('forms/edit_artist.html', artist = artist, form =  form)
                   db.session.rollback()
 
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
@@ -720,10 +719,10 @@ def edit_venue_submission(venue_id):
   # TODO: take values from the form submitted, and update existing
   # venue record with ID <venue_id> using the new attributes
   
-  form = VenueForm(request.form)
-  #venue = Venue.query.get_or_404(venue_id)
+  form = VenueForm()
+  venue = Venue.query.get_or_404(venue_id)
 
-  if request.method == 'POST':
+  if form.validate_on_submit():
 
       try:
                                  
@@ -742,20 +741,20 @@ def edit_venue_submission(venue_id):
                             'seeking_description' : form.seeking_description.data})
                     
                     db.session.commit()
-                    #flash('Venue ' + form.name.data + ' was successfully listed!')
-                    redirect(url_for('show_venue', venue_id=venue_id))
+                    flash('Venue ' + form.name.data + ' was successfully update!')
+                    return redirect(url_for('show_venue', venue_id=venue_id))
       
       except Exception as e:
                     print(e)
-                    flash('An error occurred. Venue ' + form.name.data + ' could not be listed.')
-                    return render_template('pages/home.html')
+                    flash('An error occurred. Venue ' + form.name.data + ' could not be update.')
+                    return render_template('forms/edit_venue.html', venue=venue, form = form)
                     db.session.rollback()
       
       finally:
                     db.session.close()
   else:
-                    flash('An error occurred. Artist ' + form.name.data + ' could not be listed.')
-                    return render_template('pages/home.html')
+                    #flash('An error occurred. Artist ' + form.name.data + ' could not be listed.')
+                    return render_template('forms/edit_venue.html', venue=venue, form = form)
                     db.session.rollback()
 
 
@@ -776,9 +775,9 @@ def create_artist_submission():
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
 
-  form = ArtistForm(request.form)
+  form = ArtistForm()
 
-  if request.method == 'POST':
+  if form.validate_on_submit():
 
     try:
                   new_art = Artist(
@@ -809,8 +808,8 @@ def create_artist_submission():
                   db.session.close()
     
   else:
-                  flash('An error occurred. Artist ' + form.name.data + ' could not be listed.')
-                  return render_template('pages/home.html')
+                  #flash('An error occurred. Artist ' + form.name.data + ' could not be listed.')
+                  return render_template('forms/new_artist.html', form =  form)
                   db.session.rollback()
             
 
@@ -908,9 +907,9 @@ def create_show_submission():
   # called to create new shows in the db, upon submitting new show listing form
   # TODO: insert form data as a new Show record in the db, instead
 
-  form = ShowForm(request.form)
+  form = ShowForm()
 
-  if request.method == 'POST':
+  if form.validate_on_submit():
 
     try:
                   new_show = Show(

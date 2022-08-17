@@ -1,9 +1,10 @@
 from datetime import datetime
-from flask_wtf import Form
-from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField, BooleanField
-from wtforms.validators import DataRequired, AnyOf, URL
+from flask_wtf import FlaskForm
+from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField, BooleanField, SubmitField
+from wtforms.validators import DataRequired, AnyOf, URL, Regexp
+from markupsafe import Markup
 
-class ShowForm(Form):
+class ShowForm(FlaskForm):
     artist_id = StringField(
         'artist_id'
     )
@@ -16,7 +17,7 @@ class ShowForm(Form):
         default= datetime.today()
     )
 
-class VenueForm(Form):
+class VenueForm(FlaskForm):
     name = StringField(
         'name', validators=[DataRequired()]
     )
@@ -83,7 +84,13 @@ class VenueForm(Form):
         'address', validators=[DataRequired()]
     )
     phone = StringField(
-        'phone'
+        'phone',  validators=[DataRequired(),
+                    Regexp(
+                        regex= "^[0-9]{3}-[0-9]{3}-[0-9]{4}$",
+                        message= "Invalid phone number. Must be xxx-xxx-xxxx"
+                    )
+        
+        ]
     )
     image_link = StringField(
         'image_link'
@@ -117,7 +124,7 @@ class VenueForm(Form):
         'facebook_link', validators=[URL()]
     )
     website_link = StringField(
-        'website_link'
+        'website_link', validators=[URL()]
     )
 
     seeking_talent = BooleanField( 'seeking_talent' )
@@ -125,10 +132,11 @@ class VenueForm(Form):
     seeking_description = StringField(
         'seeking_description'
     )
+    #submit_value = Markup('<input type="submit" value="Create Venue" class="btn btn-primary btn-lg btn-block">')
+    #submit = SubmitField(submit_value)
 
 
-
-class ArtistForm(Form):
+class ArtistForm(FlaskForm):
     name = StringField(
         'name', validators=[DataRequired()]
     )
@@ -193,7 +201,13 @@ class ArtistForm(Form):
     )
     phone = StringField(
         # TODO implement validation logic for state
-        'phone'
+        'phone',  validators=[DataRequired(),
+                    Regexp(
+                        regex= "^[0-9]{3}-[0-9]{3}-[0-9]{4}$",
+                        message= "Invalid phone number. Must be xxx-xxx-xxxx"
+                    )
+        
+        ]
     )
     image_link = StringField(
         'image_link'
@@ -228,7 +242,7 @@ class ArtistForm(Form):
      )
 
     website_link = StringField(
-        'website_link'
+        'website_link', validators=[URL()]
      )
 
     seeking_venue = BooleanField( 'seeking_venue' )
